@@ -151,7 +151,16 @@ define([
 
 
     SaveWidget.prototype.set_save_status = function (msg) {
-        this.element.find('span.autosave_status').text(msg);
+        //this.element.find('span.autosave_status').text(msg);
+        if (msg) {
+            var id = utils.get_url_param("id");
+            var ele = parent.document.getElementById("autosave_status_" + id);
+            if (!ele) {
+                console.log("autosave_status element not found");
+                return;
+            }
+            ele.innerHTML = msg;
+        }
     };
 
     SaveWidget.prototype._set_last_checkpoint = function (checkpoint) {
