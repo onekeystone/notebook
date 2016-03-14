@@ -123,6 +123,12 @@ class DeprecationHandler(IPythonHandler):
         """ % url_path_join('nbextensions', 'widgets', 'widgets', url_path.rstrip('.js')))
         self.log.warn('Deprecated widget Javascript path /static/widgets/js/*.js was used')
 
+class ExitHandler(IPythonHandler):
+    def get(self):
+        self.set_header("Content-Type", 'text/javascript')
+        self.log.warn('Exit command is called')
+        tornado.ioloop.IOLoop.current().stop()
+
 #-----------------------------------------------------------------------------
 # The Tornado web application
 #-----------------------------------------------------------------------------
@@ -226,6 +232,7 @@ class NotebookWebApplication(web.Application):
         # Order matters. The first handler to match the URL will handle the request.
         handlers = []
         handlers.append((r'/deprecatedwidgets/(.*)', DeprecationHandler))
+        handlers.append((r'/exit', ExitHandler))
         handlers.extend(load_handlers('tree.handlers'))
         handlers.extend([(r"/login", settings['login_handler_class'])])
         handlers.extend([(r"/logout", settings['logout_handler_class'])])
@@ -1045,7 +1052,8 @@ class NotebookApp(JupyterApp):
         self.init_components()
         self.init_webapp()
         self.init_terminals()
-        self.init_signal()
+        #by jackylin, to simplify backgroud mode in keystone
+	#self.init_signal()
         self.init_server_extensions()
 
     def cleanup_kernels(self):
